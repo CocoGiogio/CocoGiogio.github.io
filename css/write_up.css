@@ -1,0 +1,135 @@
+/* ============================================================
+   UNIVERSAL WRITE-UP STYLES (SAFE, CONTAINED, WORKS EVERYWHERE)
+   Applies only inside: <section class="report-section">
+   ============================================================ */
+
+   .report-section {
+    max-width: 900px;
+    margin: 4rem auto;
+    padding: 2.5rem;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    box-shadow: 0 0 18px rgba(255, 0, 255, 0.07);
+    backdrop-filter: blur(6px);
+  }
+  
+  /* Section Title */
+  .report-section .section-title {
+    font-size: 2.2rem;
+    margin-bottom: 1.2rem;
+    font-weight: 600;
+    text-align: center;
+    text-shadow: 0 0 6px #ff00ff66;
+    letter-spacing: 1px;
+  }
+  
+  /* Headings */
+  .report-section h2 {
+    font-size: 1.8rem;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    color: #ffffff;
+    text-shadow: 0 0 4px #00ffff77;
+  }
+  
+  .report-section h3 {
+    margin-top: 2rem;
+    margin-bottom: .6rem;
+    color: #d2f8ff;
+  }
+  
+  .report-section h4 {
+    font-size: 1.1rem;
+    margin-top: 1.4rem;
+    color: #ffb3ff;
+  }
+  
+  /* Paragraphs + Lists */
+  .report-section p,
+  .report-section ul li {
+    line-height: 1.7;
+    font-size: 1.05rem;
+    margin-bottom: 1rem;
+  }
+  
+  .report-section ul {
+    padding-left: 1.3rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .report-section ul li strong {
+    color: #00eaff;
+  }
+  
+  /* Horizontal Rule */
+  .report-section hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #ffffff33, transparent);
+    margin: 2.5rem 0;
+  }
+  
+  /* Code Blocks */
+  .report-section pre {
+    background: #0d0d0d;
+    padding: 1rem 1.3rem;
+    border-radius: 10px;
+    overflow-x: auto;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 0 12px #00ffff15;
+  }
+  
+  .report-section pre code {
+    font-family: "Courier New", monospace;
+    font-size: 0.95rem;
+  }
+  
+  /* Figure + Image */
+  .report-section figure {
+    margin: 1.8rem auto;
+    text-align: center;
+  }
+  
+  .report-section figure img {
+    max-width: 100%;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 0 20px rgba(0,255,255,0.15);
+  }
+  
+  .report-section figcaption {
+    margin-top: .6rem;
+    font-size: .95rem;
+    opacity: 0.8;
+  }
+  
+  /* Inline Code */
+  .report-section code {
+    padding: 2px 5px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+    font-size: 0.95rem;
+  }
+  
+  /* Links */
+  .report-section a {
+    color: #00eaff;
+    text-decoration: none;
+  }
+  
+  .report-section a:hover {
+    color: #ff7bff;
+    text-shadow: 0 0 6px #ff00ff88;
+  }
+  
+  /* Standalone images */
+  .report-section img {
+    display: block;
+    margin: 1.4rem auto;
+    max-width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(255,0,255,0.18);
+  }
+  
+  

