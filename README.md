@@ -28,5 +28,4 @@ The goal of this site is to showcase my expertise in **Cybersecurity**, **Networ
 ```text
 .
 ├── 📂 css/           # Custom stylesheets (style.css)
-├── 📂 assets/        # Project images and screenshots (to be added)
 └── index.html        # Main entry point for the website
